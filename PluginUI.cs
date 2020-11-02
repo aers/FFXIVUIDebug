@@ -184,8 +184,8 @@ namespace FFXIVUIDebug
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
 
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
+            if (node->PrevSiblingNode != null)
+                PrintNode(node->PrevSiblingNode);
         }
 
         private unsafe void PrintComponentNode(AtkResNode * node)
@@ -198,7 +198,7 @@ namespace FFXIVUIDebug
             if (isVisible)
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-            var componentInfo = compNode->Component->ComponentInfo;
+            var componentInfo = compNode->Component->AddonData.Component;
 
             var childCount = componentInfo != null ? componentInfo->NodeCount : 0;
 
@@ -214,9 +214,9 @@ namespace FFXIVUIDebug
 
                 if (componentInfo != null)
                 {
-                    if (ImGui.TreeNode($"child nodes tree - root node {(long)compNode->Component->RootNode:X} - node list {(long)componentInfo:X} - count {componentInfo->NodeCount}###{(long)componentInfo}"))
+                    if (ImGui.TreeNode($"child nodes tree - root node {(long)compNode->Component->AddonData.RootNode:X} - node list {(long)componentInfo:X} - count {componentInfo->NodeCount}###{(long)componentInfo}"))
                     {
-                        PrintNode(compNode->Component->RootNode);
+                        PrintNode(compNode->Component->AddonData.RootNode);
 
                         ImGui.TreePop();
                     }
@@ -241,8 +241,8 @@ namespace FFXIVUIDebug
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
 
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
+            if (node->PrevSiblingNode != null)
+                PrintNode(node->PrevSiblingNode);
         }
 
         private unsafe void PrintResNode(AtkResNode * node)
