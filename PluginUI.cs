@@ -247,7 +247,7 @@ namespace FFXIVUIDebug
 
         private unsafe void PrintResNode(AtkResNode * node)
         {
-            ImGui.Text($"X: {node->X} Y: {node->Y} ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} Rotation: {node->Rotation} Alpha: {node->Alpha}");
+            ImGui.Text($"X: {node->X} Y: {node->Y} ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} Rotation: {node->Rotation} Alpha: {node->Color.A}");
             ImGui.Text($"Width: {node->Width} Height: {node->Height} OriginX: {node->OriginX} OriginY: {node->OriginY}");
             ImGui.Text($"AddRed: {node->AddRed} AddGreen: {node->AddGreen} AddBlue: {node->AddBlue} MultiplyRed: {node->MultiplyRed} MultiplyGreen: {node->MultiplyGreen} MultiplyBlue: {node->MultiplyBlue}");
         }
