@@ -49,7 +49,8 @@ namespace FFXIVUIDebug
 
             var atkStage = getAtkStageSingleton();
 
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(1000, 500), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(1000, 500), ImGuiCond.FirstUseEver);
+
             if (ImGui.Begin("UI Debug", ref visible))
             {
                 ImGui.PushItemWidth(200);
@@ -57,6 +58,7 @@ namespace FFXIVUIDebug
                 ImGui.PopItemWidth();
                 ImGui.Checkbox("Only visible", ref FilterVisible);
 
+                ImGui.Text($"Base - {(long)_plugin.pluginInterface.TargetModuleScanner.Module.BaseAddress:X}");
                 ImGui.Text($"AtkStage - {(long)atkStage:X}");
                 ImGui.Text($"RaptureAtkUnitManager - {(long)atkStage->RaptureAtkUnitManager:X}");
 
