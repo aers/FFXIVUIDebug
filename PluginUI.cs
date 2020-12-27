@@ -62,24 +62,24 @@ namespace FFXIVUIDebug
                 ImGui.Text($"AtkStage - {(long)atkStage:X}");
                 ImGui.Text($"RaptureAtkUnitManager - {(long)atkStage->RaptureAtkUnitManager:X}");
 
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList1, "Unit List 1");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList2, "Unit List 2");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList3, "Unit List 3");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList4, "Unit List 4");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList5, "Unit List 5");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList6, "Unit List 6");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList7, "Unit List 7");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList8, "Unit List 8");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList9, "Unit List 9");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList10, "Unit List 10");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList11, "Unit List 11");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList12, "Unit List 12");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList13, "Unit List 13");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.MainUIAddonUnitList, "Main UI Addons");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList15, "Unit List 15");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList16, "Unit List 16");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList17, "Unit List 17");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList18, "Unit List 18");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerOneList, "Depth Layer 1");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTwoList, "Depth Layer 2");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerThreeList, "Depth Layer 3");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerFourList, "Depth Layer 4");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerFiveList, "Depth Layer 5");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerSixList, "Depth Layer 6");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerSevenList, "Depth Layer 7");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerEightList, "Depth Layer 8");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerNineList, "Depth Layer 9");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTenList, "Depth Layer 10");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerElevenList, "Depth Layer 11");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTwelveList, "Depth Layer 12");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerThirteenList, "Depth Layer 13");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList, "All Loaded Units");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.FocusedUnitsList, "Focused Units");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList16, "Units 16");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList17, "Units 17");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList18, "Units 18");
             }
         }
 
