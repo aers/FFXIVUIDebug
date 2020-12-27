@@ -1,4 +1,4 @@
-﻿using FFXIVClientStructs.Component.GUI;
+using FFXIVClientStructs.Component.GUI;
 using FFXIVClientStructs.Client.System.Resource.Handle;
 using ImGuiNET;
 using System;
@@ -39,6 +39,9 @@ namespace FFXIVUIDebug
             this.getAtkStageSingleton = Marshal.GetDelegateForFunctionPointer<GetAtkStageSingleton>(getSingletonAddr);
         }
 
+        private string FilterUnit = "";
+        private bool FilterVisible = false;
+
         public unsafe void Draw()
         {
             if (!IsVisible)
@@ -49,6 +52,11 @@ namespace FFXIVUIDebug
             ImGui.SetNextWindowSize(new System.Numerics.Vector2(1000, 500), ImGuiCond.FirstUseEver);
             if (ImGui.Begin("UI Debug", ref visible))
             {
+                ImGui.PushItemWidth(200);
+                ImGui.InputText("Filter", ref FilterUnit, 30);
+                ImGui.PopItemWidth();
+                ImGui.Checkbox("Only visible", ref FilterVisible);
+
                 ImGui.Text($"AtkStage - {(long)atkStage:X}");
                 ImGui.Text($"RaptureAtkUnitManager - {(long)atkStage->RaptureAtkUnitManager:X}");
 
@@ -86,6 +94,11 @@ namespace FFXIVUIDebug
                     var atkUnitBase = atkUnitBaseArray[i];
                     bool isVisible = (atkUnitBase->Flags & 0x20) == 0x20;
                     string addonName = Marshal.PtrToStringAnsi(new IntPtr(atkUnitBase->Name));
+
+                    if (FilterUnit.Length > 0 && !addonName.Contains(FilterUnit))
+                        continue;
+                    if (FilterVisible && !isVisible)
+                        continue;
 
                     if (isVisible)
                         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
