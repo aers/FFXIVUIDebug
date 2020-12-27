@@ -1,4 +1,5 @@
 using FFXIVClientStructs.Component.GUI;
+using FFXIVClientStructs.Component.GUI.ULD;
 using FFXIVClientStructs.Client.System.Resource.Handle;
 using ImGuiNET;
 using System;
@@ -105,45 +106,49 @@ namespace FFXIVUIDebug
                     if (isVisible)
                         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-                    ImGui.Text($"ptr {(long)atkUnitBase:X} - name {addonName} - X {atkUnitBase->X} Y {atkUnitBase->Y} scale {atkUnitBase->Scale} widget count {atkUnitBase->AddonData.WidgetCount}");
+                    ImGui.Text($"ptr {(long)atkUnitBase:X} - name {addonName} - X {atkUnitBase->X} Y {atkUnitBase->Y} scale {atkUnitBase->Scale} widget count {atkUnitBase->ULDData.ObjectCount}");
 
                     if (isVisible)
                         ImGui.PopStyleColor();
 
-                    var widgets = atkUnitBase->AddonData.Widgets;
-                    if (widgets != null)
-                    {
-                        if (ImGui.TreeNode($"child nodes tree - root node {(long)atkUnitBase->RootNode:X} - widget data {(long)widgets:X} - count {widgets->NodeCount}###{(long)widgets}"))
-                        {
-                            PrintNode(atkUnitBase->RootNode);
-
-                            ImGui.TreePop();
-                        }
-                    }
+                    if (atkUnitBase->RootNode != null)
+                        PrintNode(atkUnitBase->RootNode);
                 }
                 ImGui.TreePop();
             }
         }
 
-        private unsafe void PrintNode(AtkResNode * node)
+        private unsafe void PrintNode(AtkResNode* node, bool printSiblings = true, string treePrefix = "")
         {
-            if (node->Type < 1000)
-                PrintSimpleNode(node);
+            if (node == null)
+                return;
+
+            if ((int)node->Type < 1000)
+                PrintSimpleNode(node, treePrefix);
             else
-                PrintComponentNode(node);
+                PrintComponentNode(node, treePrefix);
+
+            if (printSiblings)
+            {
+                var prevNode = node;
+                while ((prevNode = prevNode->PrevSiblingNode) != null)
+                    PrintNode(prevNode, false, "prev ");
+
+                var nextNode = node;
+                while ((nextNode = nextNode->NextSiblingNode) != null)
+                    PrintNode(nextNode, false, "next ");
+            }
         }
 
-        private unsafe void PrintSimpleNode(AtkResNode * node)
+        private unsafe void PrintSimpleNode(AtkResNode* node, string treePrefix)
         {
-            var type = (NodeType)node->Type;
-
             bool popped = false;
             bool isVisible = (node->Flags & 0x10) == 0x10;
 
             if (isVisible)
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-            if (ImGui.TreeNode($"{type} Node (ptr = {(long)node:X})###{(long)node}"))
+            if (ImGui.TreeNode($"{treePrefix}{node->Type} Node (ptr = {(long)node:X})###{(long)node}"))
             {
                 if (isVisible)
                 {
@@ -155,14 +160,10 @@ namespace FFXIVUIDebug
 
                 if (node->ChildNode != null)
                 {
-                    if (ImGui.TreeNode($"children###{(long)node}children"))
-                    {
-                        PrintNode(node->ChildNode);
-                        ImGui.TreePop();
-                    }
+                    PrintNode(node->ChildNode);
                 }
 
-                switch (type)
+                switch (node->Type)
                 {
                     case NodeType.Text:
                         var textNode = (AtkTextNode*)node;
@@ -174,17 +175,25 @@ namespace FFXIVUIDebug
                         break;
                     case NodeType.Image:
                         var imageNode = (AtkImageNode*)node;
-                        if (imageNode->TPInfo != null)
+                        if (imageNode->PartsList != null)
                         {
-                            if (imageNode->PartId > imageNode->TPInfo->PartCount)
+                            if (imageNode->PartId > imageNode->PartsList->PartCount)
                                 ImGui.Text("part id > part count?");
                             else
                             {
-                                var textureInfo = imageNode->TPInfo->Parts[imageNode->PartId].TextureInfo;
-                                var texString = Marshal.PtrToStringAnsi(new IntPtr(textureInfo->AtkTexture.TextureInfo->TexFileResourceHandle->ResourceHandle.FileName));
-                                ImGui.Text($"texture path: {texString}");
+                                var textureInfo = imageNode->PartsList->Parts[imageNode->PartId].ULDTexture;
+                                // TODO: Something in here isn't set, occasionally it fails. Has been seen in WeeklyPuzzle
+                                try
+                                {
+                                    var texFileNamePtr = textureInfo->AtkTexture.TextureInfo->TexFileResourceHandle->ResourceHandle.FileName;
+                                    var texString = Marshal.PtrToStringAnsi(new IntPtr(texFileNamePtr));
+                                    ImGui.Text($"texture path: {texString} part_id={imageNode->PartId} part_id_count={imageNode->PartsList->PartCount}");
+                                }
+                                catch (NullReferenceException)
+                                {
+                                    ImGui.Text($"texture path: null");
+                                }
                             }
-
                         }
                         else
                         {
@@ -198,12 +207,9 @@ namespace FFXIVUIDebug
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
-
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
         }
 
-        private unsafe void PrintComponentNode(AtkResNode * node)
+        private unsafe void PrintComponentNode(AtkResNode* node, string treePrefix)
         {
             var compNode = (AtkComponentNode*)node;
 
@@ -213,11 +219,12 @@ namespace FFXIVUIDebug
             if (isVisible)
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-            var componentInfo = compNode->Component->ComponentInfo;
+            var componentInfo = compNode->Component->ULDData;
 
-            var childCount = componentInfo != null ? componentInfo->NodeCount : 0;
+            var childCount = componentInfo.NodeListCount;
 
-            if (ImGui.TreeNode($"{(ComponentType)componentInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}###{(long)node}"))
+            var objectInfo = (ULDComponentInfo*)componentInfo.Objects;
+            if (ImGui.TreeNode($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}  ###{(long)node}"))
             {
                 if (isVisible)
                 {
@@ -226,17 +233,9 @@ namespace FFXIVUIDebug
                 }
 
                 PrintResNode(node);
+                PrintNode(componentInfo.RootNode);
 
-                if (componentInfo != null)
-                {
-                    if (ImGui.TreeNode($"child nodes tree - root node {(long)compNode->Component->RootNode:X} - node list {(long)componentInfo:X} - count {componentInfo->NodeCount}###{(long)componentInfo}"))
-                    {
-                        PrintNode(compNode->Component->RootNode);
-
-                        ImGui.TreePop();
-                    }
-                }
-                switch ((ComponentType)componentInfo->ComponentType)
+                switch (objectInfo->ComponentType)
                 {
                     case ComponentType.TextInput:
                         var textInputComponent = (AtkComponentTextInput*)compNode->Component;
@@ -255,16 +254,21 @@ namespace FFXIVUIDebug
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
-
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
         }
 
-        private unsafe void PrintResNode(AtkResNode * node)
+        private unsafe void PrintResNode(AtkResNode* node)
         {
-            ImGui.Text($"X: {node->X} Y: {node->Y} ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} Rotation: {node->Rotation} Alpha: {node->Color.A}");
-            ImGui.Text($"Width: {node->Width} Height: {node->Height} OriginX: {node->OriginX} OriginY: {node->OriginY}");
-            ImGui.Text($"AddRed: {node->AddRed} AddGreen: {node->AddGreen} AddBlue: {node->AddBlue} MultiplyRed: {node->MultiplyRed} MultiplyGreen: {node->MultiplyGreen} MultiplyBlue: {node->MultiplyBlue}");
+            ImGui.Text($"NodeID: {node->NodeID}");
+            ImGui.Text(
+                $"X: {node->X} Y: {node->Y} " +
+                $"ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} " +
+                $"Rotation: {node->Rotation} " +
+                $"Width: {node->Width} Height: {node->Height} " +
+                $"OriginX: {node->OriginX} OriginY: {node->OriginY}");
+            ImGui.Text(
+                $"RGBA: 0x{node->Color.R:X2}{node->Color.G:X2}{node->Color.B:X2}{node->Color.A:X2} " +
+                $"AddRGB: {node->AddRed} {node->AddGreen} {node->AddBlue} " +
+                $"MultiplyRGB: {node->MultiplyRed} {node->MultiplyGreen} {node->MultiplyBlue}");
         }
 
         protected virtual void Dispose(bool disposing)
