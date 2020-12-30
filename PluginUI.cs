@@ -42,6 +42,7 @@ namespace FFXIVUIDebug
 
         private string FilterUnit = "";
         private bool FilterVisible = false;
+        private bool highlightHovered = false;
 
         public unsafe void Draw()
         {
@@ -58,6 +59,9 @@ namespace FFXIVUIDebug
                 ImGui.InputText("Filter", ref FilterUnit, 30);
                 ImGui.PopItemWidth();
                 ImGui.Checkbox("Only visible", ref FilterVisible);
+                ImGui.SameLine();
+                ImGui.Checkbox("Highlight Hovered", ref highlightHovered);
+
 
                 ImGui.Text($"Base - {(long)_plugin.pluginInterface.TargetModuleScanner.Module.BaseAddress:X}");
                 ImGui.Text($"AtkStage - {(long)atkStage:X}");
@@ -150,6 +154,7 @@ namespace FFXIVUIDebug
 
             if (ImGui.TreeNode($"{treePrefix}{node->Type} Node (ptr = {(long)node:X})###{(long)node}"))
             {
+                if (ImGui.IsItemHovered()) DrawOutline(node);
                 if (isVisible)
                 {
                     ImGui.PopStyleColor();
@@ -204,6 +209,7 @@ namespace FFXIVUIDebug
 
                 ImGui.TreePop();
             }
+            else if(ImGui.IsItemHovered()) DrawOutline(node);
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
@@ -226,6 +232,7 @@ namespace FFXIVUIDebug
             var objectInfo = (ULDComponentInfo*)componentInfo.Objects;
             if (ImGui.TreeNode($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}  ###{(long)node}"))
             {
+                if (ImGui.IsItemHovered()) DrawOutline(node);
                 if (isVisible)
                 {
                     ImGui.PopStyleColor();
@@ -251,6 +258,7 @@ namespace FFXIVUIDebug
 
                 ImGui.TreePop();
             }
+            else if (ImGui.IsItemHovered()) DrawOutline(node);
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
@@ -289,5 +297,33 @@ namespace FFXIVUIDebug
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        private unsafe Vector2 GetNodePosition(AtkResNode* node) {
+            var pos = new Vector2(node->X, node->Y);
+            var par = node->ParentNode;
+            while (par != null) {
+                pos += new Vector2(par->X, par->Y);
+                par = par->ParentNode;
+            }
+            return pos;
+        }
+
+        private unsafe bool GetNodeVisible(AtkResNode* node) {
+            if (node == null) return false;
+            while (node != null) {
+                if ((node->Flags & (short)NodeFlags.Visible) != (short)NodeFlags.Visible) return false;
+                node = node->ParentNode;
+            }
+            return true;
+        }
+
+        private unsafe void DrawOutline(AtkResNode* node) {
+            if (!highlightHovered) return;
+            var position = GetNodePosition(node);
+            var size = new Vector2(node->Width * node->ScaleX, node->Height * node->ScaleY);
+            var nodeVisible = GetNodeVisible(node);
+            ImGui.GetForegroundDrawList().AddRect(position, position + size, nodeVisible ? 0xFF00FF00 : 0xFF0000FF);
+        }
+
     }
 }
