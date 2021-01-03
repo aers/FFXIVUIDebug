@@ -1,4 +1,5 @@
-﻿using FFXIVClientStructs.Component.GUI;
+using FFXIVClientStructs.Component.GUI;
+using FFXIVClientStructs.Component.GUI.ULD;
 using FFXIVClientStructs.Client.System.Resource.Handle;
 using ImGuiNET;
 using System;
@@ -39,6 +40,10 @@ namespace FFXIVUIDebug
             this.getAtkStageSingleton = Marshal.GetDelegateForFunctionPointer<GetAtkStageSingleton>(getSingletonAddr);
         }
 
+        private string FilterUnit = "";
+        private bool FilterVisible = false;
+        private bool highlightHovered = false;
+
         public unsafe void Draw()
         {
             if (!IsVisible)
@@ -46,30 +51,40 @@ namespace FFXIVUIDebug
 
             var atkStage = getAtkStageSingleton();
 
-            ImGui.SetNextWindowSize(new System.Numerics.Vector2(1000, 500), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(new Vector2(1000, 500), ImGuiCond.FirstUseEver);
+
             if (ImGui.Begin("UI Debug", ref visible))
             {
+                ImGui.PushItemWidth(200);
+                ImGui.InputText("Filter", ref FilterUnit, 30);
+                ImGui.PopItemWidth();
+                ImGui.Checkbox("Only visible", ref FilterVisible);
+                ImGui.SameLine();
+                ImGui.Checkbox("Highlight Hovered", ref highlightHovered);
+
+
+                ImGui.Text($"Base - {(long)_plugin.pluginInterface.TargetModuleScanner.Module.BaseAddress:X}");
                 ImGui.Text($"AtkStage - {(long)atkStage:X}");
                 ImGui.Text($"RaptureAtkUnitManager - {(long)atkStage->RaptureAtkUnitManager:X}");
 
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList1, "Unit List 1");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList2, "Unit List 2");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList3, "Unit List 3");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList4, "Unit List 4");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList5, "Unit List 5");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList6, "Unit List 6");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList7, "Unit List 7");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList8, "Unit List 8");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList9, "Unit List 9");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList10, "Unit List 10");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList11, "Unit List 11");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList12, "Unit List 12");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList13, "Unit List 13");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.MainUIAddonUnitList, "Main UI Addons");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList15, "Unit List 15");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList16, "Unit List 16");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList17, "Unit List 17");
-                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList18, "Unit List 18");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerOneList, "Depth Layer 1");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTwoList, "Depth Layer 2");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerThreeList, "Depth Layer 3");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerFourList, "Depth Layer 4");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerFiveList, "Depth Layer 5");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerSixList, "Depth Layer 6");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerSevenList, "Depth Layer 7");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerEightList, "Depth Layer 8");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerNineList, "Depth Layer 9");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTenList, "Depth Layer 10");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerElevenList, "Depth Layer 11");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerTwelveList, "Depth Layer 12");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.DepthLayerThirteenList, "Depth Layer 13");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList, "All Loaded Units");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.FocusedUnitsList, "Focused Units");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList16, "Units 16");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList17, "Units 17");
+                PrintAtkUnitList(&atkStage->RaptureAtkUnitManager->AtkUnitManager.UnitList18, "Units 18");
             }
         }
 
@@ -87,49 +102,59 @@ namespace FFXIVUIDebug
                     bool isVisible = (atkUnitBase->Flags & 0x20) == 0x20;
                     string addonName = Marshal.PtrToStringAnsi(new IntPtr(atkUnitBase->Name));
 
+                    if (FilterUnit.Length > 0 && !addonName.Contains(FilterUnit))
+                        continue;
+                    if (FilterVisible && !isVisible)
+                        continue;
+
                     if (isVisible)
                         ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-                    ImGui.Text($"ptr {(long)atkUnitBase:X} - name {addonName} - X {atkUnitBase->X} Y {atkUnitBase->Y} scale {atkUnitBase->Scale} widget count {atkUnitBase->AddonData.WidgetCount}");
+                    ImGui.Text($"ptr {(long)atkUnitBase:X} - name {addonName} - X {atkUnitBase->X} Y {atkUnitBase->Y} scale {atkUnitBase->Scale} widget count {atkUnitBase->ULDData.ObjectCount}");
 
                     if (isVisible)
                         ImGui.PopStyleColor();
 
-                    var widgets = atkUnitBase->AddonData.Widgets;
-                    if (widgets != null)
-                    {
-                        if (ImGui.TreeNode($"child nodes tree - root node {(long)atkUnitBase->RootNode:X} - widget data {(long)widgets:X} - count {widgets->NodeCount}###{(long)widgets}"))
-                        {
-                            PrintNode(atkUnitBase->RootNode);
-
-                            ImGui.TreePop();
-                        }
-                    }
+                    if (atkUnitBase->RootNode != null)
+                        PrintNode(atkUnitBase->RootNode);
                 }
                 ImGui.TreePop();
             }
         }
 
-        private unsafe void PrintNode(AtkResNode * node)
+        private unsafe void PrintNode(AtkResNode* node, bool printSiblings = true, string treePrefix = "")
         {
-            if (node->Type < 1000)
-                PrintSimpleNode(node);
+            if (node == null)
+                return;
+
+            if ((int)node->Type < 1000)
+                PrintSimpleNode(node, treePrefix);
             else
-                PrintComponentNode(node);
+                PrintComponentNode(node, treePrefix);
+
+            if (printSiblings)
+            {
+                var prevNode = node;
+                while ((prevNode = prevNode->PrevSiblingNode) != null)
+                    PrintNode(prevNode, false, "prev ");
+
+                var nextNode = node;
+                while ((nextNode = nextNode->NextSiblingNode) != null)
+                    PrintNode(nextNode, false, "next ");
+            }
         }
 
-        private unsafe void PrintSimpleNode(AtkResNode * node)
+        private unsafe void PrintSimpleNode(AtkResNode* node, string treePrefix)
         {
-            var type = (NodeType)node->Type;
-
             bool popped = false;
             bool isVisible = (node->Flags & 0x10) == 0x10;
 
             if (isVisible)
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-            if (ImGui.TreeNode($"{type} Node (ptr = {(long)node:X})###{(long)node}"))
+            if (ImGui.TreeNode($"{treePrefix}{node->Type} Node (ptr = {(long)node:X})###{(long)node}"))
             {
+                if (ImGui.IsItemHovered()) DrawOutline(node);
                 if (isVisible)
                 {
                     ImGui.PopStyleColor();
@@ -140,14 +165,10 @@ namespace FFXIVUIDebug
 
                 if (node->ChildNode != null)
                 {
-                    if (ImGui.TreeNode($"children###{(long)node}children"))
-                    {
-                        PrintNode(node->ChildNode);
-                        ImGui.TreePop();
-                    }
+                    PrintNode(node->ChildNode);
                 }
 
-                switch (type)
+                switch (node->Type)
                 {
                     case NodeType.Text:
                         var textNode = (AtkTextNode*)node;
@@ -159,17 +180,25 @@ namespace FFXIVUIDebug
                         break;
                     case NodeType.Image:
                         var imageNode = (AtkImageNode*)node;
-                        if (imageNode->TPInfo != null)
+                        if (imageNode->PartsList != null)
                         {
-                            if (imageNode->PartId > imageNode->TPInfo->PartCount)
+                            if (imageNode->PartId > imageNode->PartsList->PartCount)
                                 ImGui.Text("part id > part count?");
                             else
                             {
-                                var textureInfo = imageNode->TPInfo->Parts[imageNode->PartId].TextureInfo;
-                                var texString = Marshal.PtrToStringAnsi(new IntPtr(textureInfo->AtkTexture.TextureInfo->TexFileResourceHandle->ResourceHandle.FileName));
-                                ImGui.Text($"texture path: {texString}");
+                                var textureInfo = imageNode->PartsList->Parts[imageNode->PartId].ULDTexture;
+                                // TODO: Something in here isn't set, occasionally it fails. Has been seen in WeeklyPuzzle
+                                try
+                                {
+                                    var texFileNamePtr = textureInfo->AtkTexture.TextureInfo->TexFileResourceHandle->ResourceHandle.FileName;
+                                    var texString = Marshal.PtrToStringAnsi(new IntPtr(texFileNamePtr));
+                                    ImGui.Text($"texture path: {texString} part_id={imageNode->PartId} part_id_count={imageNode->PartsList->PartCount}");
+                                }
+                                catch (NullReferenceException)
+                                {
+                                    ImGui.Text($"texture path: null");
+                                }
                             }
-
                         }
                         else
                         {
@@ -180,15 +209,13 @@ namespace FFXIVUIDebug
 
                 ImGui.TreePop();
             }
+            else if(ImGui.IsItemHovered()) DrawOutline(node);
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
-
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
         }
 
-        private unsafe void PrintComponentNode(AtkResNode * node)
+        private unsafe void PrintComponentNode(AtkResNode* node, string treePrefix)
         {
             var compNode = (AtkComponentNode*)node;
 
@@ -198,12 +225,14 @@ namespace FFXIVUIDebug
             if (isVisible)
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0, 255, 0, 255));
 
-            var componentInfo = compNode->Component->ComponentInfo;
+            var componentInfo = compNode->Component->ULDData;
 
-            var childCount = componentInfo != null ? componentInfo->NodeCount : 0;
+            var childCount = componentInfo.NodeListCount;
 
-            if (ImGui.TreeNode($"{(ComponentType)componentInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}###{(long)node}"))
+            var objectInfo = (ULDComponentInfo*)componentInfo.Objects;
+            if (ImGui.TreeNode($"{treePrefix}{objectInfo->ComponentType} Component Node (ptr = {(long)node:X}, component ptr = {(long)compNode->Component:X}) child count = {childCount}  ###{(long)node}"))
             {
+                if (ImGui.IsItemHovered()) DrawOutline(node);
                 if (isVisible)
                 {
                     ImGui.PopStyleColor();
@@ -211,17 +240,9 @@ namespace FFXIVUIDebug
                 }
 
                 PrintResNode(node);
+                PrintNode(componentInfo.RootNode);
 
-                if (componentInfo != null)
-                {
-                    if (ImGui.TreeNode($"child nodes tree - root node {(long)compNode->Component->RootNode:X} - node list {(long)componentInfo:X} - count {componentInfo->NodeCount}###{(long)componentInfo}"))
-                    {
-                        PrintNode(compNode->Component->RootNode);
-
-                        ImGui.TreePop();
-                    }
-                }
-                switch ((ComponentType)componentInfo->ComponentType)
+                switch (objectInfo->ComponentType)
                 {
                     case ComponentType.TextInput:
                         var textInputComponent = (AtkComponentTextInput*)compNode->Component;
@@ -237,19 +258,25 @@ namespace FFXIVUIDebug
 
                 ImGui.TreePop();
             }
+            else if (ImGui.IsItemHovered()) DrawOutline(node);
 
             if (isVisible && !popped)
                 ImGui.PopStyleColor();
-
-            if (node->NextSiblingNode != null)
-                PrintNode(node->NextSiblingNode);
         }
 
-        private unsafe void PrintResNode(AtkResNode * node)
+        private unsafe void PrintResNode(AtkResNode* node)
         {
-            ImGui.Text($"X: {node->X} Y: {node->Y} ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} Rotation: {node->Rotation} Alpha: {node->Color.A}");
-            ImGui.Text($"Width: {node->Width} Height: {node->Height} OriginX: {node->OriginX} OriginY: {node->OriginY}");
-            ImGui.Text($"AddRed: {node->AddRed} AddGreen: {node->AddGreen} AddBlue: {node->AddBlue} MultiplyRed: {node->MultiplyRed} MultiplyGreen: {node->MultiplyGreen} MultiplyBlue: {node->MultiplyBlue}");
+            ImGui.Text($"NodeID: {node->NodeID}");
+            ImGui.Text(
+                $"X: {node->X} Y: {node->Y} " +
+                $"ScaleX: {node->ScaleX} ScaleY: {node->ScaleY} " +
+                $"Rotation: {node->Rotation} " +
+                $"Width: {node->Width} Height: {node->Height} " +
+                $"OriginX: {node->OriginX} OriginY: {node->OriginY}");
+            ImGui.Text(
+                $"RGBA: 0x{node->Color.R:X2}{node->Color.G:X2}{node->Color.B:X2}{node->Color.A:X2} " +
+                $"AddRGB: {node->AddRed} {node->AddGreen} {node->AddBlue} " +
+                $"MultiplyRGB: {node->MultiplyRed} {node->MultiplyGreen} {node->MultiplyBlue}");
         }
 
         protected virtual void Dispose(bool disposing)
@@ -270,5 +297,46 @@ namespace FFXIVUIDebug
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        private unsafe Vector2 GetNodePosition(AtkResNode* node) {
+            var pos = new Vector2(node->X, node->Y);
+            var par = node->ParentNode;
+            while (par != null) {
+                pos *= new Vector2(par->ScaleX, par->ScaleY);
+                pos += new Vector2(par->X, par->Y);
+                par = par->ParentNode;
+            }
+            return pos;
+        }
+
+        private unsafe Vector2 GetNodeScale(AtkResNode* node) {
+            if (node == null) return new Vector2(1, 1);
+            var scale = new Vector2(node->ScaleX, node->ScaleY);
+            while (node->ParentNode != null) {
+                node = node->ParentNode;
+                scale *= new Vector2(node->ScaleX, node->ScaleY);
+            }
+            return scale;
+        }
+
+        private unsafe bool GetNodeVisible(AtkResNode* node) {
+            if (node == null) return false;
+            while (node != null) {
+                if ((node->Flags & (short)NodeFlags.Visible) != (short)NodeFlags.Visible) return false;
+                node = node->ParentNode;
+            }
+            return true;
+        }
+
+        private unsafe void DrawOutline(AtkResNode* node) {
+            if (!highlightHovered) return;
+            var position = GetNodePosition(node);
+            var scale = GetNodeScale(node);
+            var size = new Vector2(node->Width, node->Height) * scale;
+            
+            var nodeVisible = GetNodeVisible(node);
+            ImGui.GetForegroundDrawList().AddRect(position, position + size, nodeVisible ? 0xFF00FF00 : 0xFF0000FF);
+        }
+
     }
 }
