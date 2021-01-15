@@ -195,6 +195,12 @@ namespace FFXIVUIDebug
                                     var texFileNamePtr = textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName;
                                     var texString = Marshal.PtrToStringAnsi(new IntPtr(texFileNamePtr));
                                     ImGui.Text($"texture path: {texString}");
+                                    var kernelTexture = textureInfo->AtkTexture.Resource->KernelTextureObject;
+                                    ImGui.Image(new IntPtr(kernelTexture->D3D11ShaderResourceView), new Vector2(kernelTexture->Width, kernelTexture->Height));
+                                }
+                                else if (texType == TextureType.KernelTexture)
+                                {
+                                    ImGui.Image(new IntPtr(textureInfo->AtkTexture.KernelTexture->D3D11ShaderResourceView), new Vector2(textureInfo->AtkTexture.KernelTexture->Width, textureInfo->AtkTexture.KernelTexture->Height));
                                 }
                             }
                         }
