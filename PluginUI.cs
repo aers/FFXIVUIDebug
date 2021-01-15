@@ -187,16 +187,14 @@ namespace FFXIVUIDebug
                             else
                             {
                                 var textureInfo = imageNode->PartsList->Parts[imageNode->PartId].ULDTexture;
-                                // TODO: Something in here isn't set, occasionally it fails. Has been seen in WeeklyPuzzle
-                                try
+                                var texType = textureInfo->AtkTexture.TextureType;
+
+                                ImGui.Text($"texture type: {texType} part_id={imageNode->PartId} part_id_count={imageNode->PartsList->PartCount}");
+                                if (texType == TextureType.Resource)
                                 {
-                                    var texFileNamePtr = textureInfo->AtkTexture.TextureInfo->TexFileResourceHandle->ResourceHandle.FileName;
+                                    var texFileNamePtr = textureInfo->AtkTexture.Resource->TexFileResourceHandle->ResourceHandle.FileName;
                                     var texString = Marshal.PtrToStringAnsi(new IntPtr(texFileNamePtr));
-                                    ImGui.Text($"texture path: {texString} part_id={imageNode->PartId} part_id_count={imageNode->PartsList->PartCount}");
-                                }
-                                catch (NullReferenceException)
-                                {
-                                    ImGui.Text($"texture path: null");
+                                    ImGui.Text($"texture path: {texString}");
                                 }
                             }
                         }
